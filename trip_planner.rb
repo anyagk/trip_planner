@@ -1,14 +1,21 @@
+require 'pry'
 require 'httparty'
 require 'cgi'
+require 'json'
+require 'date'
 
 class TripPlanner
-  attr_reader :user, :forecast, :recommendation
+  attr_reader :user, :forecast, :recommendation 
+  attr_accessor :user1
   
   def initialize
     # Should be empty, you'll create and store @user, @forecast and @recommendation elsewhere
   end
-  
+
   def plan
+    @user = self.create_user
+    @forecast = self.retrieve_forecast
+    @recommendation = self.create_recommendation
     # Plan should call create_user, retrieve_forecast and create_recommendation 
     # After, you should display the recommendation, and provide an option to 
     # save it to disk.  There are two optional methods below that will keep this
@@ -22,16 +29,82 @@ class TripPlanner
   # end
   
   def create_user
+    puts "Please enter your name:"
+    name = gets.chomp
+    puts "Please enter the destination city (City Name, State Initials):"
+    destination = gets.chomp
+    puts "Please enter how long you'll be there:"
+    duration = gets.chomp
+    user = User.new(name, destination, duration)
+    @user1 = [name, destination, duration]
+    puts user1
     # provide the interface asking for name, destination and duration
     # then, create and store the User object
   end
   
   def retrieve_forecast
+    city = @user1[1]
+    days = @user1[2]
+    units = "imperial" # you can change this to metric if you prefer
+    options = "daily?q=#{CGI::escape(city)}&mode=json&units=#{units}&cnt=#{days}"
+    response =  HTTParty.get("http://api.openweathermap.org/data/2.5/forecast/#{options}")
+    result = JSON.parse(response.body)
+    # Pry.start(binding)
+    stats_array = result["list"]
+
+    dt_array = stats_array.map do |day|
+     day.map do |title, stats|
+       if title == "dt"
+         stats
+       end
+     end
+   end
+   
+   
+
+    # day_array = []
+    # day_array = stats_array.map do |day|
+    #   day.map do |title, stats|
+    #     if title == "dt"
+    #       stats
+    #     elsif title == "temp"
+    #       stats["min"]
+    #     elsif title == "weather"
+    #       stats["main"]
+    #     elsif title == "pressure"
+    #       day["temp"]["max"]
+
+    #     end 
+    #   end
+    # end
+
+      
+
+      @date = stats_array["dt"]
+      @min_temp = stats_array["temp"]["min"]
+      @max_temp = stats_array["temp"]["max"]
+      @main = stats_array["weather"]["main"]
+    
+
+    # retrieved = user.call_api
+    # retrieved.parse_result
+    # units = "imperial" # you can change this to metric if you prefer
+    # options = "daily?q=#{CGI::escape(city)}&mode=json&units=#{units}&cnt=#{days}"
     # use HTTParty.get to get the forecast, and then turn it into an array of
     # Weather objects... you  might want to institute the two methods below
     # so this doesn't get out of hand...
   end
   
+  # def call_api
+  #   city = user[1]
+  #   days = user[2]
+  #   units = "imperial" # you can change this to metric if you prefer
+  #   options = "daily?q=#{CGI::escape(city)}&mode=json&units=#{units}&cnt=#{days}"
+  #   response =  HTTParty.get("http://api.openweathermap.org/data/2.5/forecast/#{options}")
+  # end
+  # def parse_result
+  #   result = JSON.parse(response.body)
+  # end
   # def call_api
   # end
   #
@@ -113,9 +186,11 @@ class User
   attr_reader :name, :destination, :duration
   
   def initialize(name, destination, duration)
-    
+    @name = name
+    @destination = destination
+    @duration = duration    
   end
 end
 
 trip_planner = TripPlanner.new
-trip_planner.start
+trip_planner.plan
