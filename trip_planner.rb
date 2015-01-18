@@ -2,7 +2,7 @@ require 'pry'
 require 'httparty'
 require 'cgi'
 require 'json'
-require 'date'
+
 
 class TripPlanner
   attr_reader :user, :forecast, :recommendation 
@@ -36,31 +36,38 @@ class TripPlanner
     puts "Please enter how long you'll be there:"
     duration = gets.chomp
     user = User.new(name, destination, duration)
-    @user1 = [name, destination, duration]
-    puts user1
+    # @user1 = [name, destination, duration]
+    # puts user1
     # provide the interface asking for name, destination and duration
     # then, create and store the User object
   end
   
+
+
   def retrieve_forecast
-    city = @user1[1]
-    days = @user1[2]
+    city = @user.destination
+    days = @user.duration
     units = "imperial" # you can change this to metric if you prefer
     options = "daily?q=#{CGI::escape(city)}&mode=json&units=#{units}&cnt=#{days}"
     response =  HTTParty.get("http://api.openweathermap.org/data/2.5/forecast/#{options}")
     result = JSON.parse(response.body)
-    # Pry.start(binding)
-    stats_array = result["list"]
+   # Pry.start(binding)
+  stats_array = result["list"]
 
-    dt_array = stats_array.map do |day|
-     day.map do |title, stats|
-       if title == "dt"
-         stats
-       end
-     end
-   end
+  weather_array = stats_array.map do |day|
+    Weather.new(day["temp"]["min"], day["temp"]["max"], day["weather"][0]["main"])
+   # day.map do |title, stats|
+   #   if title == "dt"
+   #     stats
+   #   end
+   # end
    
-   
+ end
+ puts weather_array
+ end
+   # Pry.start(binding)
+      # Pry.start(binding)
+
 
     # day_array = []
     # day_array = stats_array.map do |day|
@@ -77,13 +84,13 @@ class TripPlanner
     #     end 
     #   end
     # end
-
+    # puts"_________________"
       
 
-      @date = stats_array["dt"]
-      @min_temp = stats_array["temp"]["min"]
-      @max_temp = stats_array["temp"]["max"]
-      @main = stats_array["weather"]["main"]
+    #   @date = stats_array["dt"]
+    #   @min_temp = stats_array["temp"]["min"]
+    #   @max_temp = stats_array["temp"]["max"]
+    #   @main = stats_array["weather"]["main"]
     
 
     # retrieved = user.call_api
@@ -93,7 +100,7 @@ class TripPlanner
     # use HTTParty.get to get the forecast, and then turn it into an array of
     # Weather objects... you  might want to institute the two methods below
     # so this doesn't get out of hand...
-  end
+  
   
   # def call_api
   #   city = user[1]
@@ -112,6 +119,8 @@ class TripPlanner
   # end
   
   def create_recommendation
+    Weather.appropriate_clothing
+
     # once you have the forecast, ask each Weather object for the appropriate
     # clothing and accessories, store the result in @recommendation.  You might
     # want to implement the two methods below to help you kee this method
@@ -138,43 +147,95 @@ class Weather
         "insulated parka", "long underwear", "fleece-lined jeans",
         "mittens", "knit hat", "chunky scarf"
       ]
+    },
+    {
+      min_temp: 1, max_temp: 60,
+      recommendation: [
+        "windbreaker", "long sleeved shirt", "jeans", "socks"
+      ]
+    },
+    {
+      min_temp: 61, max_temp: 150,
+      recommendation: [
+        "tanktop", "shorts", "bathing suit", "skirt", "t shirt"
+      ]
     }
   ]
 
   ACCESSORIES = [
     {
-      condition: "Rainy",
+      condition: "Rain",
       recommendation: [
         "galoshes", "umbrella"
+      ]
+    },
+    {
+      condition: "Clear",
+      recommendation: [
+        "sunglasses", "flipflops", "handfan"
+      ]
+    },
+    {
+      condition: "Snow",
+      recommendation: [
+        "snow boots", "goggles", "crampons", "ski poles"
       ]
     }
   ]
   
   def initialize(min_temp, max_temp, condition)
-    
+    @min_temp = min_temp
+    @max_temp = max_temp
+    @condition = condition
   end
   
+  def to_s
+   puts "the high is #{max_temp}, the low is #{min_temp} and the description is #{condition}"
+    
+  end
+
   def self.clothing_for(temp)
+    if temp >= CLOTHES[0][:min_temp] && temp <= CLOTHES[0][:max_temp]
+      return CLOTHES[0][:recommendation]
+    elsif temp >= CLOTHES[1][:min_temp] && temp <= CLOTHES[1][:max_temp]
+      return CLOTHES[1][:recommendation]
+    elsif temp > CLOTHES[2][:min_temp] && temp <= CLOTHES[2][:max_temp]
+      return CLOTHES[2][:recommendation]
+    end
     # This is a class method, have it find the hash in CLOTHES so that the 
     # input temp is between min_temp and max_temp, and then return the 
     # recommendation.
   end
   
   def self.accessories_for(condition)
+    if condition == ACCESSORIES[0][:condition]
+      return ACCESSORIES[0][:recommendation]
+    elsif condition == ACCESSORIES[1][:condition]
+      return ACCESSORIES[1][:recommendation]
+    elsif condition == ACCESSORIES[2][:condition]
+      return ACCESSORIES[2][:recommendation]
+    end 
     # This is a class method, have it find the hash in ACCESSORIES so that
     # the condition matches the input condition, and then return the
     # recommendation.
   end
   
+  clothing_array = []
   def appropriate_clothing
+    clothing_array << Weather.clothing_for(@min_temp)
+    clothing_array << Weather.clothing_for(@max_temp)
+    clothing_array.uniq
+    
     # Use the results of Weather.clothing_for(@min_temp) and 
     # Weather.clothing_for(@max_temp) to make an array of appropriate
     # clothing for the weather object.
     # You should avoid making the same suggestion twice... think
     # about using .uniq here
   end
-  
+  puts clothing_array
   def appropriate_accessories
+    Weather.accessories_for
+
     # Use the results of Weather.accessories_for(@condition) to make
     # an array of appropriate accessories for the weather object.
     # You should avoid making the same suggestion twice... think
