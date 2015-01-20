@@ -19,7 +19,7 @@ class TripPlanner
   def plan
     @user = self.create_user
     @forecast = self.retrieve_forecast
-    @recommendation = self.create_recommendation.uniq
+    @recommendation = self.create_recommendation
 
     # Plan should call create_user, retrieve_forecast and create_recommendation 
     # After, you should display the recommendation, and provide an option to 
@@ -159,11 +159,13 @@ class Weather
     clothing_array = []
     clothing_array << Weather.clothing_for(@min_temp)
     clothing_array << Weather.clothing_for(@max_temp)
+    puts clothing_array.uniq
   end
 
   def appropriate_accessories
     accessories_array = []
     accessories_array << Weather.accessories_for(@condition)
+    puts accessories_array.uniq
   end
 
 end
