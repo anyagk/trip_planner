@@ -19,7 +19,7 @@ class TripPlanner
   def plan
     @user = self.create_user
     @forecast = self.retrieve_forecast
-    @recommendation = self.create_recommendation
+    @recommendation = self.create_recommendation.uniq
 
     # Plan should call create_user, retrieve_forecast and create_recommendation 
     # After, you should display the recommendation, and provide an option to 
@@ -159,15 +159,11 @@ class Weather
     clothing_array = []
     clothing_array << Weather.clothing_for(@min_temp)
     clothing_array << Weather.clothing_for(@max_temp)
-    puts clothing_array.uniq
-
   end
 
   def appropriate_accessories
     accessories_array = []
-    accessories_array << Weather.accessories_for(@min_temp)
-    accessories_array << Weather.accessories_for(@max_temp)
-    puts accessories_array.uniq
+    accessories_array << Weather.accessories_for(@condition)
   end
 
 end
@@ -184,3 +180,52 @@ end
 
 trip_planner = TripPlanner.new
 trip_planner.plan
+
+# day_array = []
+    # day_array = stats_array.map do |day|
+    #   day.map do |title, stats|
+    #     if title == "dt"
+    #       stats
+    #     elsif title == "temp"
+    #       stats["min"]
+    #     elsif title == "weather"
+    #       stats["main"]
+    #     elsif title == "pressure"
+    #       day["temp"]["max"]
+
+    #     end 
+    #   end
+    # end
+    # puts"_________________"
+
+
+    #   @date = stats_array["dt"]
+    #   @min_temp = stats_array["temp"]["min"]
+    #   @max_temp = stats_array["temp"]["max"]
+    #   @main = stats_array["weather"]["main"]
+    
+
+    # retrieved = user.call_api
+    # retrieved.parse_result
+    # units = "imperial" # you can change this to metric if you prefer
+    # options = "daily?q=#{CGI::escape(city)}&mode=json&units=#{units}&cnt=#{days}"
+    # use HTTParty.get to get the forecast, and then turn it into an array of
+    # Weather objects... you  might want to institute the two methods below
+    # so this doesn't get out of hand...
+
+
+  # def call_api
+  #   city = user[1]
+  #   days = user[2]
+  #   units = "imperial" # you can change this to metric if you prefer
+  #   options = "daily?q=#{CGI::escape(city)}&mode=json&units=#{units}&cnt=#{days}"
+  #   response =  HTTParty.get("http://api.openweathermap.org/data/2.5/forecast/#{options}")
+  # end
+  # def parse_result
+  #   result = JSON.parse(response.body)
+  # end
+  # def call_api
+  # end
+  #
+  # def parse_result
+  # end
