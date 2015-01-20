@@ -45,8 +45,8 @@ This means that `TripPlanner` will have the following attributes and methods:
 ### `TripPlanner#initialize`
 Our initialize will be funny, in that it won't do anything, or take any parameters.
 
-### `TripPlanner#start`
-Start is where the action happens.  Start, as a method, should do these things:
+### `TripPlanner#plan`
+plan is where the action happens.  Plan, as a method, should do these things:
   - Assign the result of `.create_user` to `@user`
   - Assign the result of `.retrieve_forecast` to `@forecast`
   - Assign the result of `.create_recommendation` to `@recommendation`

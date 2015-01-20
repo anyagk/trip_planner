@@ -1,25 +1,16 @@
 require 'pry'
 require 'httparty'
 require 'cgi'
-<<<<<<< HEAD
 require 'json'
 
 
 class TripPlanner
   attr_reader :user, :forecast, :recommendation 
   
-=======
-require 'pry'
-
-class TripPlanner
-  attr_reader :user, :forecast, :recommendation
-
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
   def initialize
-
+    # Should be empty, you'll create and store @user, @forecast and @recommendation elsewhere
   end
 
-<<<<<<< HEAD
   def to_s
     "Hi, #{name}, welcome to your trip planner! On your journey to #{destination} for #{duration} day, I'd recommend you bring: #{recom}. Have fun!"
   end
@@ -34,40 +25,15 @@ class TripPlanner
     # After, you should display the recommendation, and provide an option to 
     # save it to disk.  There are two optional methods below that will keep this
     # method cleaner.
-=======
-  def plan
-    @user = create_user
-
-    @forecast = retrieve_forecast
-    unless @forecast
-      puts "City not found..."
-      return nil
-    end
-
-    @recommendation = create_recommendation
-
-    display_recommendation
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
   end
-
-  def display_recommendation
-    puts @user
-
-    puts "You'll need the following clothes: "
-    @recommendation[:clothes].each do |piece|
-      puts "- #{piece}"
-    end
-    puts "And the following accessories: "
-    @recommendation[:accessories].each do |piece|
-      puts "- #{piece}"
-    end
-  end
-
+  
+  # def display_recommendation
+  # end
+  #
   # def save_recommendation
   # end
-
+  
   def create_user
-<<<<<<< HEAD
     puts "Please enter your name:"
     name = gets.chomp
     puts "Please enter the destination city (City Name, State Initials):"
@@ -106,90 +72,19 @@ class TripPlanner
     end
   end
 
-=======
-    print "Your name > "
-    name = gets.chomp
-
-    print "Trip Destination (e.g. Binghamton, NY) > "
-    destination = gets.chomp
-
-    print "Trip Duration (in days) > "
-    duration = gets.chomp.to_i
-
-    return User.new(name, destination, duration)
-  end
-
-  def retrieve_forecast
-    result = call_api
-
-    return parse_result(call_api)
-  end
-
-  def call_api
-    options = "?q=#{CGI::escape(@user.destination)}&" +
-              "" +
-              "units=imperial&" +
-              "cnt=#{@user.duration}"
-
-    url = "http://api.openweathermap.org/" +
-          "data/2.5/forecast/daily#{options}"
-
-    HTTParty.get(url)
-  end
-
-  def parse_result(result)
-    Pry.start(binding)
-    return nil if result["404"]
-
-    stripped_results = result["list"].map do |day|
-      {
-        min_temp:  day["temp"]["min"],
-        max_temp:  day["temp"]["max"],
-        condition: day["weather"][0]["main"]
-      }
-    end
-
-    weather_array = stripped_results.map do |info|
-      Weather.new(info[:min_temp], info[:max_temp], info[:condition])
-    end
-  end
-
-  def create_recommendation
-    return {
-      clothes: collect_clothes,
-      accessories: collect_accessories
-    }
-  end
-
-  def collect_clothes
-    @forecast.map do |weather|
-      weather.appropriate_clothing
-    end.flatten.uniq
-  end
-
-  def collect_accessories
-    @forecast.map do |weather|
-      weather.appropriate_accessories
-    end.flatten.uniq
-  end
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
 end
     # once you have the forecast, ask each Weather object for the appropriate
     # clothing and accessories, store the result in @recommendation.  You might
 
 class Weather
   attr_reader :min_temp, :max_temp, :condition
-<<<<<<< HEAD
   
-=======
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
 
   CLOTHES = [
     {
-      min_temp: -50, max_temp: 20,
+      min_temp: -50, max_temp: 0,
       recommendation: [
         "insulated parka", "long underwear", "fleece-lined jeans",
-<<<<<<< HEAD
         "mittens", "knit hat", "chunky scarf"]
     },
     {
@@ -201,29 +96,6 @@ class Weather
       min_temp: 61, max_temp: 150,
       recommendation: [
         "tanktop", "shorts", "bathing suit", "skirt", "t shirt"]
-=======
-        "mittens", "knit hat", "chunky scarf"
-      ]
-    },
-    {
-      min_temp: 20, max_temp: 40,
-      recommendation: [
-        "down jacket", "sweater", "corduroy pants",
-        "wool cap", "gloves"
-      ]
-    },
-    {
-      min_temp: 40, max_temp: 70,
-      recommendation: [
-        "sport coat", "cardigan", "slacks"
-      ]
-    },
-    {
-      min_temp: 70, max_temp: 120,
-      recommendation: [
-        "shorts", "short sleeve shirt"
-      ]
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
     }
   ]
 
@@ -232,7 +104,6 @@ class Weather
     {
       condition: "Rain",
       recommendation: [
-<<<<<<< HEAD
       "galoshes", "umbrella"]
     },
     {
@@ -244,28 +115,6 @@ class Weather
       condition: "Snow",
       recommendation: [
         "snow boots", "goggles", "crampons", "ski poles"]
-=======
-        "galoshes", "umbrella"
-      ]
-    },
-    {
-      condition: "Clouds",
-      recommendation: [
-        "galoshes", "umbrella"
-      ]
-    },
-    {
-      condition: "Clear",
-      recommendation: [
-        "sun glasses", "visor"
-      ]
-    },
-    {
-      condition: "Snow",
-      recommendation: [
-        "chunky scarf", "knit hat"
-      ]
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
     }
   ]
 
@@ -273,7 +122,6 @@ class Weather
     @min_temp = min_temp
     @max_temp = max_temp
     @condition = condition
-<<<<<<< HEAD
   end
 
   def to_s
@@ -318,36 +166,6 @@ class Weather
     accessories_array = []
     accessories_array << Weather.accessories_for(@condition)
     puts accessories_array.uniq
-=======
-  end
-
-  def to_s
-    "#{@condition}, temperature between #{@min_temp} and #{@max_temp}."
-  end
-
-  def self.clothing_for(temp)
-    entry = CLOTHES.find do |entry|
-      entry[:min_temp] <= temp && temp < entry[:max_temp]
-    end
-
-    entry[:recommendation]
-  end
-
-  def self.accessories_for(condition)
-    entry = ACCESSORIES.find do |entry|
-      entry[:condition] == condition
-    end
-
-    entry[:recommendation]
-  end
-
-  def appropriate_clothing
-    Weather.clothing_for(@min_temp) + Weather.clothing_for(@max_temp)
-  end
-
-  def appropriate_accessories
-    Weather.accessories_for(@condition)
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
   end
 
 end
@@ -358,21 +176,12 @@ class User
   def initialize(name, destination, duration)
     @name = name
     @destination = destination
-<<<<<<< HEAD
     @duration = duration    
-=======
-    @duration = duration
-  end
-
-  def to_s
-    "#{@name}, you are going to #{@destination} for #{@duration} days."
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
   end
 end
 
 trip_planner = TripPlanner.new
 trip_planner.plan
-<<<<<<< HEAD
 
 # day_array = []
     # day_array = stats_array.map do |day|
@@ -422,5 +231,3 @@ trip_planner.plan
   #
   # def parse_result
   # end
-=======
->>>>>>> 204aa03a8d2311cda12f5101b5b5f496d71582de
